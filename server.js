@@ -61,12 +61,12 @@ app.post('/telegram_bot', async (req, res) => {
             } else {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "Sila sertai (join) 3 Group/Channel Rasmi kami di bawah terlebih dahulu untuk membuka akses muat turun! 🛑",
+                    text: "Sila sertai (join) salurannya di bawah terlebih dahulu untuk membuka akses muat turun! 🛑",
                     reply_markup: {
                         inline_keyboard: [
-                            [{ text: "Kumpulan 1 👥", url: LINK_GROUP_1 }],
-                            [{ text: "Kumpulan 2 👥", url: LINK_GROUP_2 }],
-                            [{ text: "Kumpulan 3 👥", url: LINK_GROUP_3 }],
+                            [{ text: "Group 👥", url: LINK_GROUP_1 }],
+                            [{ text: "Backup 👥", url: LINK_GROUP_2 }],
+                            [{ text: "Channel 👥", url: LINK_GROUP_3 }],
                             [{ text: "🔄 Sudah Sertai? Klik Sini Untuk Semak", callback_data: "recheck" }]
                         ]
                     }
@@ -90,7 +90,7 @@ app.post('/telegram_bot', async (req, res) => {
             if (join1 && join3) {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "Tahniah! Anda telah menyertai semua kumpulan. Sila pilih fail untuk dimuat turun:",
+                    text: "Tahniah! Anda telah menyertai semua saluran yang ditetapkan. Sila pilih fail untuk dimuat turun:",
                     reply_markup: {
                         inline_keyboard: [
                             [{ text: "📦 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
@@ -101,7 +101,7 @@ app.post('/telegram_bot', async (req, res) => {
             } else {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "❌ Anda belum menyertai semua kumpulan yang ditetapkan. Sila semak semula."
+                    text: "❌ Anda belum menyertai kesemua saluran yang ditetapkan. Sila semak semula."
                 });
             }
         }
@@ -126,4 +126,4 @@ app.post('/telegram_bot', async (req, res) => {
     res.status(200).send("OK");
 });
 
-app.listen(PORT, () => console.log(`Server Force Join running...`));
+app.listen(PORT, () => console.log(`Server Force Join running on port ${PORT}...`));
