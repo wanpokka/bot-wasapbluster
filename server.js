@@ -10,9 +10,9 @@ const PORT = process.env.PORT || 3000;
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
     
-    // Kalau hang hantar fail dokumen/apk, dia akan masuk sini
+    // Dah cantum rapat bagi tak error
     if (body.message && body.message.document) {
-        const fileId Baru = body.message.document.file_id;
+        const fileIdBaru = body.message.document.file_id;
         const fileName = body.message.document.file_name;
         
         console.log("=========================================");
@@ -23,6 +23,10 @@ app.post('/telegram_bot', async (req, res) => {
     }
     
     res.status(200).send("OK");
+});
+
+app.get('/', (req, res) => {
+    res.send("Server Pencari ID Aktif!");
 });
 
 app.listen(PORT, () => console.log(`Server pencari ID berjalan...`));
