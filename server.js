@@ -5,9 +5,8 @@ const app = express();
 app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
-
-const FILE_WASAP_BLUSTER = "BQACAgUAAxbBAAMCAg2bf8YY-dRo94aHQ51qbbJ_YN4AAjcaAAL9zXFUSafdwiWwqu7BA";
-const FILE_FB_BLUSTER = "BQACAgUAAxbBAAMIAg3jbh5txCoZnfJd2XLCDle-WoAA1AaAAL9zXFUP2bN1DqIAu47E";
+const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAAMCag2bf8YY-dRo94aHQ51qbBj_YN4AAjcaAAL9zXFUSafdwbLbWqU7BA";
+const FILE_FB_BLUSTER = "BQACAgUAAxkBAAMIag3jbh5txCoZnFJd2XLCDLrE-WoAAlAaAAL9zXFUP2bN1DqiAu47BA";
 
 const GROUP_1_ID = "@blustermarketingtools"; 
 const GROUP_3_ID = "@marketingtoolsmy";
@@ -18,60 +17,71 @@ const LINK_GROUP_3 = "https://t.me/marketingtoolsmy";
 
 const PORT = process.env.PORT || 3000;
 
+// Fungsi semakan dengan Timeout 3 saat (Biar cepat)
 async function checkDahJoin(userId, groupId) {
     try {
         const res = await axios.get(`https://api.telegram.org/bot${TOKEN_BOT}/getChatMember`, {
-            params: { chat_id: groupId, user_id: userId }
+            params: { chat_id: groupId, user_id: userId },
+            timeout: 3000 
         });
         return ["member", "administrator", "creator"].includes(res.data.result.status);
-    } catch (error) {
-        return false;
-    }
+    } catch (e) { return false; }
 }
 
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
-    
-    // Log setiap mesej masuk untuk tengok apa yang bot terima
-    console.log("Mesej Diterima:", JSON.stringify(body, null, 2));
+    if (!body.message && !body.callback_query) return res.sendStatus(200);
 
-    if (body.callback_query) {
-        const callbackId = body.callback_query.id;
-        const chatId = body.callback_query.message.chat.id;
-        const action = body.callback_query.data;
+    // Respon pantas
+    res.sendStatus(200);
 
-        await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/answerCallbackQuery`, { callback_query_id: callbackId });
+    if (body.message?.text === "/start" || body.message?.text === "/download") {
+        const chatId = body.message.chat.id;
+        const userId = body.message.from.id;
 
-        console.log("Butang ditekan:", action);
+        // Jalankan semakan serentak (Promise.all supaya laju)
+        const [join1, join3] = await Promise.all([
+            checkDahJoin(userId, GROUP_1_ID),
+            checkDahJoin(userId, GROUP_3_ID)
+        ]);
 
-        if (action === "dl_wasap") {
-            try {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
-                    chat_id: chatId,
-                    document: FILE_WASAP_BLUSTER,
-                    caption: "Berikut adalah aplikasi WasapBluster Official yang anda minta. Sila pasang (install) pada peranti anda!\n\nUntuk trial boleh PM @blusterCS"
-                });
-                console.log("WasapBluster berjaya dihantar.");
-            } catch (err) {
-                console.error("Gagal hantar WasapBluster:", err.response ? err.response.data : err.message);
-            }
-        }
-
-        if (action === "dl_fb") {
-            try {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
-                    chat_id: chatId,
-                    document: FILE_FB_BLUSTER,
-                    caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda!\n\nUntuk trial boleh PM @blusterCS"
-                });
-                console.log("FB Bluster berjaya dihantar.");
-            } catch (err) {
-                console.error("Gagal hantar FB Bluster:", err.response ? err.response.data : err.message);
-            }
+        if (join1 && join3) {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
+                chat_id: chatId,
+                text: "Terima kasih! Sila pilih fail untuk dimuat turun:",
+                reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] }
+            });
+        } else {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
+                chat_id: chatId,
+                text: "Sila sertai saluran di bawah untuk akses muat turun: 🚫",
+                reply_markup: { inline_keyboard: [[{ text: "Group 💬", url: LINK_GROUP_1 }], [{ text: "Backup 📢", url: LINK_GROUP_2 }], [{ text: "Channel 📢", url: LINK_GROUP_3 }], [{ text: "🔄 Semak", callback_data: "recheck" }]] }
+            });
         }
     }
-    res.status(200).send("OK");
+
+    if (body.callback_query) {
+        const { id, from, message, data } = body.callback_query;
+        axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/answerCallbackQuery`, { callback_query_id: id });
+
+        if (data === "recheck") {
+            const [j1, j3] = await Promise.all([checkDahJoin(from.id, GROUP_1_ID), checkDahJoin(from.id, GROUP_3_ID)]);
+            if (j1 && j3) {
+                axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
+                    chat_id: message.chat.id,
+                    text: "Mantap! Sila pilih fail:",
+                    reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] }
+                });
+            } else {
+                axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, { chat_id: message.chat.id, text: "❌ Belum sertai semua saluran." });
+            }
+        }
+
+        if (data === "dl_wasap") axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_WASAP_BLUSTER, caption: "WasapBluster Official. Untuk trial boleh PM @blusterCS" });
+        if (data === "dl_fb") axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_FB_BLUSTER, caption: "FB Bluster Official. Untuk trial boleh PM @blusterCS" });
+    }
 });
 
-app.listen(PORT, () => console.log(`Server aktif pada port ${PORT}`));
-            
+// Endpoint untuk elak Render tidur (Ping setiap 5 minit)
+app.get('/', (req, res) => res.send("Bot Aktif!"));
+app.listen(PORT);
