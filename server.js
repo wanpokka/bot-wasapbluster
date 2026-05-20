@@ -53,20 +53,20 @@ app.post('/telegram_bot', async (req, res) => {
                     text: "Terima kasih kerana melengkapkan syarat! Sila pilih fail untuk dimuat turun 👇",
                     reply_markup: {
                         inline_keyboard: [
-                            [{ text: "📦 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
-                            [{ text: "🚀 Muat Turun FB Bluster APK", callback_data: "dl_fb" }]
+                            [{ text: "📥 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
+                            [{ text: "📥 Muat Turun FB Bluster APK", callback_data: "dl_fb" }]
                         ]
                     }
                 });
             } else {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "Sila sertai (join) salurannya di bawah terlebih dahulu untuk membuka akses muat turun! 🛑",
+                    text: "Sila sertai (join) saluran di bawah terlebih dahulu untuk membuka akses muat turun! 🚫",
                     reply_markup: {
                         inline_keyboard: [
-                            [{ text: "Group 👥", url: LINK_GROUP_1 }],
-                            [{ text: "Backup 👥", url: LINK_GROUP_2 }],
-                            [{ text: "Channel 👥", url: LINK_GROUP_3 }],
+                            [{ text: "Group 💬", url: LINK_GROUP_1 }],
+                            [{ text: "Backup 📢", url: LINK_GROUP_2 }],
+                            [{ text: "Channel 📢", url: LINK_GROUP_3 }],
                             [{ text: "🔄 Sudah Sertai? Klik Sini Untuk Semak", callback_data: "recheck" }]
                         ]
                     }
@@ -93,8 +93,8 @@ app.post('/telegram_bot', async (req, res) => {
                     text: "Tahniah! Anda telah menyertai semua saluran yang ditetapkan. Sila pilih fail untuk dimuat turun:",
                     reply_markup: {
                         inline_keyboard: [
-                            [{ text: "📦 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
-                            [{ text: "🚀 Muat Turun FB Bluster APK", callback_data: "dl_fb" }]
+                            [{ text: "📥 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
+                            [{ text: "📥 Muat Turun FB Bluster APK", callback_data: "dl_fb" }]
                         ]
                     }
                 });
@@ -106,11 +106,12 @@ app.post('/telegram_bot', async (req, res) => {
             }
         }
 
+        // Penghantaran fail berserta teks nota trial PM @blusterCS
         if (action === "dl_wasap") {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
                 chat_id: chatId,
                 document: FILE_WASAP_BLUSTER,
-                caption: "Berikut adalah aplikasi WasapBluster Official yang anda minta. Sila pasang (install) pada peranti anda!"
+                caption: "Berikut adalah aplikasi WasapBluster Official yang anda minta. Sila pasang (install) pada peranti anda!\n\nUntuk trial boleh PM @blusterCS"
             });
         }
 
@@ -118,7 +119,7 @@ app.post('/telegram_bot', async (req, res) => {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
                 chat_id: chatId,
                 document: FILE_FB_BLUSTER,
-                caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda!"
+                caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda!\n\nUntuk trial boleh PM @blusterCS"
             });
         }
     }
