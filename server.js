@@ -6,13 +6,15 @@ app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
 
-// PASTIKAN ID NI BERBEZA ANTARA WASAP DAN FB
-// Kalau ID ni sama, bot akan error/tak hantar apa-apa
-const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
-const FILE_FB_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
+// GANTI ID DI BAWAH INI DENGAN ID YANG HANG DAPAT DARI LOG TADI
+const FILE_WASAP_BLUSTER = "MASUKKAN_ID_WASAP_DI_SINI"; 
+const FILE_FB_BLUSTER = "MASUKKAN_ID_FB_DI_SINI"; 
 
 const GROUP_1_ID = "@blustermarketingtools"; 
 const GROUP_3_ID = "@marketingtoolsmy";
+
+const LINK_GROUP_1 = "https://t.me/blustermarketingtools";
+const LINK_GROUP_3 = "https://t.me/marketingtoolsmy";
 
 const PORT = process.env.PORT || 3000;
 
@@ -28,11 +30,7 @@ async function checkDahJoin(userId, groupId) {
 
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
-    res.sendStatus(200); // Kena hantar cepat-cepat
-
-    if (body.message?.document) {
-        console.log("FILE ID DITERIMA: ", body.message.document.file_id);
-    }
+    res.sendStatus(200);
 
     if (body.message?.text === "/start" || body.message?.text === "/download") {
         const [join1, join3] = await Promise.all([checkDahJoin(body.message.from.id, GROUP_1_ID), checkDahJoin(body.message.from.id, GROUP_3_ID)]);
@@ -40,7 +38,7 @@ app.post('/telegram_bot', async (req, res) => {
         if (join1 && join3) {
             axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                 chat_id: body.message.chat.id,
-                text: "Pilih fail:",
+                text: "Terima kasih! Sila pilih fail:",
                 reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] }
             });
         }
@@ -50,21 +48,10 @@ app.post('/telegram_bot', async (req, res) => {
         const { id, message, data } = body.callback_query;
         axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/answerCallbackQuery`, { callback_query_id: id });
 
-        if (data === "dl_wasap" || data === "dl_fb") {
-            const fileId = (data === "dl_wasap") ? FILE_WASAP_BLUSTER : FILE_FB_BLUSTER;
-            
-            try {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
-                    chat_id: message.chat.id,
-                    document: fileId
-                });
-            } catch (err) {
-                console.log("Error hantar fail:", err.response?.data?.description);
-                axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                    chat_id: message.chat.id,
-                    text: "❌ Fail gagal dihantar. Sila hubungi admin."
-                });
-            }
+        if (data === "dl_wasap") {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_WASAP_BLUSTER });
+        } else if (data === "dl_fb") {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_FB_BLUSTER });
         }
     }
 });
