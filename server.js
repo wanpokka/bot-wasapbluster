@@ -6,17 +6,12 @@ app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
 
-// ID FAIL TERKINI DARI LOG HANG
-const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA";
-const FILE_FB_BLUSTER = "BQACAgUAAxkBAANQAheZVDLOIm13DQE0ZPHtIC13PwAAhsfAAIUIU1UOZlP7H0vDoBk7BA";
+// Masukkan ID yang hang dapat nanti di sini
+const FILE_WASAP_BLUSTER = "ISI_ID_WASAP_DI_SINI"; 
+const FILE_FB_BLUSTER = "ISI_ID_FB_DI_SINI"; 
 
-// USERNAME GROUP
 const GROUP_1_ID = "@blustermarketingtools"; 
 const GROUP_3_ID = "@marketingtoolsmy";
-
-const LINK_GROUP_1 = "https://t.me/blustermarketingtools";
-const LINK_GROUP_2 = "https://t.me/+7jhlh_mNQoRiYjM1";
-const LINK_GROUP_3 = "https://t.me/marketingtoolsmy";
 
 const PORT = process.env.PORT || 3000;
 
@@ -25,8 +20,7 @@ async function checkDahJoin(userId, groupId) {
         const res = await axios.get(`https://api.telegram.org/bot${TOKEN_BOT}/getChatMember`, {
             params: { chat_id: groupId, user_id: userId }
         });
-        const status = res.data.result.status;
-        return ["member", "administrator", "creator"].includes(status);
+        return ["member", "administrator", "creator"].includes(res.data.result.status);
     } catch (error) {
         return false;
     }
@@ -34,93 +28,37 @@ async function checkDahJoin(userId, groupId) {
 
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
-    
-    if (body.message && body.message.text) {
-        const chatId = body.message.chat.id;
+    res.sendStatus(200);
+
+    // FUNGSI PANCING ID: Bila hang forward fail ke bot, ID keluar kat Log Render
+    if (body.message?.document) {
+        console.log("FILE ID DITERIMA: ", body.message.document.file_id);
+    }
+
+    if (body.message?.text === "/start" || body.message?.text === "/download") {
         const userId = body.message.from.id;
-        const text = body.message.text;
-
-        if (text === "/start" || text === "/download") {
-            const join1 = await checkDahJoin(userId, GROUP_1_ID);
-            const join3 = await checkDahJoin(userId, GROUP_3_ID);
-
-            if (join1 && join3) {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                    chat_id: chatId,
-                    text: "Terima kasih! Sila pilih fail untuk dimuat turun 👇",
-                    reply_markup: {
-                        inline_keyboard: [
-                            [{ text: "📥 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
-                            [{ text: "📥 Muat Turun FB Bluster APK", callback_data: "dl_fb" }]
-                        ]
-                    }
-                });
-            } else {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                    chat_id: chatId,
-                    text: "Sila sertai (join) saluran di bawah untuk membuka akses muat turun! 🚫",
-                    reply_markup: {
-                        inline_keyboard: [
-                            [{ text: "Group 💬", url: LINK_GROUP_1 }],
-                            [{ text: "Backup 📢", url: LINK_GROUP_2 }],
-                            [{ text: "Channel 📢", url: LINK_GROUP_3 }],
-                            [{ text: "🔄 Sudah Sertai? Klik Sini", callback_data: "recheck" }]
-                        ]
-                    }
-                });
-            }
+        const [join1, join3] = await Promise.all([checkDahJoin(userId, GROUP_1_ID), checkDahJoin(userId, GROUP_3_ID)]);
+        
+        if (join1 && join3) {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
+                chat_id: body.message.chat.id,
+                text: "Terima kasih! Sila pilih fail:",
+                reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] }
+            });
         }
     }
 
     if (body.callback_query) {
-        const callbackId = body.callback_query.id;
-        const chatId = body.callback_query.message.chat.id;
-        const userId = body.callback_query.from.id;
-        const action = body.callback_query.data;
+        const { id, message, data } = body.callback_query;
+        axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/answerCallbackQuery`, { callback_query_id: id });
 
-        await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/answerCallbackQuery`, { callback_query_id: callbackId });
-
-        if (action === "recheck") {
-            const join1 = await checkDahJoin(userId, GROUP_1_ID);
-            const join3 = await checkDahJoin(userId, GROUP_3_ID);
-
-            if (join1 && join3) {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                    chat_id: chatId,
-                    text: "Tahniah! Anda telah menyertai semua saluran. Sila pilih fail:",
-                    reply_markup: {
-                        inline_keyboard: [
-                            [{ text: "📥 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
-                            [{ text: "📥 FB Bluster APK", callback_data: "dl_fb" }]
-                        ]
-                    }
-                });
-            } else {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                    chat_id: chatId,
-                    text: "❌ Anda belum menyertai kesemua saluran yang ditetapkan."
-                });
-            }
-        }
-
-        if (action === "dl_wasap") {
-            await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
-                chat_id: chatId,
-                document: FILE_WASAP_BLUSTER,
-                caption: "WasapBluster Official. Untuk trial boleh PM @blusterCS"
-            });
-        }
-
-        if (action === "dl_fb") {
-            await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
-                chat_id: chatId,
-                document: FILE_FB_BLUSTER,
-                caption: "FB Bluster Official. Untuk trial boleh PM @blusterCS"
-            });
+        if (data === "dl_wasap") {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_WASAP_BLUSTER });
+        } else if (data === "dl_fb") {
+            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_FB_BLUSTER });
         }
     }
-
-    res.status(200).send("OK");
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}...`));
+app.get('/', (req, res) => res.send("Bot Aktif!"));
+app.listen(PORT);
