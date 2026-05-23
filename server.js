@@ -6,15 +6,12 @@ app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
 
-// GANTI ID DI BAWAH INI DENGAN ID YANG HANG DAPAT DARI LOG TADI
-const FILE_WASAP_BLUSTER = "MASUKKAN_ID_WASAP_DI_SINI"; 
-const FILE_FB_BLUSTER = "MASUKKAN_ID_FB_DI_SINI"; 
+// ID DAH BETUL DARI GAMBAR TERBARU
+const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
+const FILE_FB_BLUSTER = "BQACAgUAAxkBAANQAheZVDLOIm13DQE0ZPHtIC13PwAAhsfAAIUIU1UOZlP7H0vDoBk7BA"; 
 
 const GROUP_1_ID = "@blustermarketingtools"; 
 const GROUP_3_ID = "@marketingtoolsmy";
-
-const LINK_GROUP_1 = "https://t.me/blustermarketingtools";
-const LINK_GROUP_3 = "https://t.me/marketingtoolsmy";
 
 const PORT = process.env.PORT || 3000;
 
