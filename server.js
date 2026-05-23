@@ -70,13 +70,13 @@ app.post('/telegram_bot', async (req, res) => {
             } else {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "Sila sertai (join) saluran di bawah terlebih dahulu untuk membuka akses muat turun! 🚫",
+                    text: "Sila join link di bawah terlebih dahulu untuk membuka akses muat turun! 🚫",
                     reply_markup: {
                         inline_keyboard: [
                             [{ text: "Group 💬", url: LINK_GROUP_1 }],
                             [{ text: "Backup 📢", url: LINK_GROUP_2 }],
                             [{ text: "Channel 📢", url: LINK_GROUP_3 }],
-                            [{ text: "🔄 Sudah Sertai? Klik Sini Untuk Semak", callback_data: "recheck" }]
+                            [{ text: "🔄 Sudah Join? Klik Sini Untuk Semak", callback_data: "recheck" }]
                         ]
                     }
                 });
@@ -99,7 +99,7 @@ app.post('/telegram_bot', async (req, res) => {
             if (join1 && join3) {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "Tahniah! Anda telah menyertai semua saluran yang ditetapkan. Sila pilih fail untuk dimuat turun:",
+                    text: "Tahniah! Anda telah join semua group & channel. Sila pilih fail untuk dimuat turun:",
                     reply_markup: {
                         inline_keyboard: [
                             [{ text: "📥 Muat Turun WasapBluster APK", callback_data: "dl_wasap" }],
@@ -110,7 +110,7 @@ app.post('/telegram_bot', async (req, res) => {
             } else {
                 await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: chatId,
-                    text: "❌ Anda belum menyertai kesemua saluran yang ditetapkan. Sila semak semula."
+                    text: "❌ Anda belum join group & channel yang ditetapkan. Sila semak semula."
                 });
             }
         }
@@ -119,7 +119,7 @@ app.post('/telegram_bot', async (req, res) => {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
                 chat_id: chatId,
                 document: FILE_WASAP_BLUSTER,
-                caption: "Berikut adalah aplikasi WasapBluster Official yang anda minta. Sila pasang (install) pada peranti anda!\n\nUntuk trial boleh PM @blusterCS"
+                caption: "Berikut adalah aplikasi Wasap Bluster Official yang anda minta. Sila pasang (install) pada peranti anda.Allow permission yang diperlukan.TQ!\n\nUntuk trial boleh PM @blusterCS"
             });
         }
 
@@ -127,7 +127,7 @@ app.post('/telegram_bot', async (req, res) => {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
                 chat_id: chatId,
                 document: FILE_FB_BLUSTER,
-                caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda!\n\nUntuk trial boleh PM @blusterCS"
+                caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda.Allow permission yang diperlukan.TQ!\n\nUntuk trial boleh PM @blusterCS"
             });
         }
     }
