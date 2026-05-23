@@ -49,7 +49,7 @@ app.post('/telegram_bot', async (req, res) => {
                 text: "Terima kasih! Sila pilih fail:",
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: "📥 WasapBluster", callback_data: "dl_wasap" }],
+                        [{ text: "📥 Wasap Bluster", callback_data: "dl_wasap" }],
                         [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]
                     ]
                 }
@@ -78,16 +78,16 @@ app.post('/telegram_bot', async (req, res) => {
             const userId = body.callback_query.from.id;
             const [join1, join3] = await Promise.all([checkDahJoin(userId, GROUP_1_ID), checkDahJoin(userId, GROUP_3_ID)]);
             if (join1 && join3) {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, { chat_id: message.chat.id, text: "Tahniah! Pilih fail:", reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] } });
+                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, { chat_id: message.chat.id, text: "Ok Let'Go! Pilih fail:", reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] } });
             } else {
-                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, { chat_id: message.chat.id, text: "❌ Anda belum join semua saluran." });
+                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, { chat_id: message.chat.id, text: "❌ Anda belum join channel & group dibawah." });
             }
         }
 
         if (data === "dl_wasap") {
-            await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_WASAP_BLUSTER, caption: "WasapBluster Official. PM @blusterCS untuk trial." });
+            await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_WASAP_BLUSTER, caption: "WasapBluster Official.Pastikan Disable Play Protection di Playstore sebelum install. PM @blusterCS untuk trial." });
         } else if (data === "dl_fb") {
-            await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_FB_BLUSTER, caption: "FB Bluster Official. PM @blusterCS untuk trial." });
+            await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_FB_BLUSTER, caption: "FB Bluster Official.Pastikan Disable Play Protection di Playstore sebelum install. PM @blusterCS untuk trial." });
         }
     }
 
