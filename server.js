@@ -46,7 +46,7 @@ app.post('/telegram_bot', async (req, res) => {
         if (join1 && join3) {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                 chat_id: body.message.chat.id,
-                text: "Terima kasih! Sila pilih fail:",
+                text: "Done! Sila pilih fail dibawah:",
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: "📥 Wasap Bluster", callback_data: "dl_wasap" }],
