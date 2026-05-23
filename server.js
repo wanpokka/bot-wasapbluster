@@ -6,16 +6,13 @@ app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
 
-// FILE ID TERBARU
+// PASTIKAN ID NI BERBEZA ANTARA WASAP DAN FB
+// Kalau ID ni sama, bot akan error/tak hantar apa-apa
 const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
 const FILE_FB_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
 
 const GROUP_1_ID = "@blustermarketingtools"; 
 const GROUP_3_ID = "@marketingtoolsmy";
-
-const LINK_GROUP_1 = "https://t.me/blustermarketingtools";
-const LINK_GROUP_2 = "https://t.me/+7jhlh_mNQoRiYjM1";
-const LINK_GROUP_3 = "https://t.me/marketingtoolsmy";
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,55 +28,46 @@ async function checkDahJoin(userId, groupId) {
 
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
-    
-    // Pancing ID (Biarkan saja, tak kacau bot)
+    res.sendStatus(200); // Kena hantar cepat-cepat
+
     if (body.message?.document) {
-        console.log("BOOM! FILE ID: ", body.message.document.file_id);
+        console.log("FILE ID DITERIMA: ", body.message.document.file_id);
     }
 
-    if (!body.message && !body.callback_query) return res.sendStatus(200);
-    res.sendStatus(200);
-
     if (body.message?.text === "/start" || body.message?.text === "/download") {
-        const chatId = body.message.chat.id;
-        const userId = body.message.from.id;
-        const [join1, join3] = await Promise.all([checkDahJoin(userId, GROUP_1_ID), checkDahJoin(userId, GROUP_3_ID)]);
-
+        const [join1, join3] = await Promise.all([checkDahJoin(body.message.from.id, GROUP_1_ID), checkDahJoin(body.message.from.id, GROUP_3_ID)]);
+        
         if (join1 && join3) {
             axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                chat_id: chatId,
-                text: "Terima kasih! Sila pilih fail:",
+                chat_id: body.message.chat.id,
+                text: "Pilih fail:",
                 reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] }
-            });
-        } else {
-            axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
-                chat_id: chatId,
-                text: "Sila sertai saluran untuk akses muat turun:",
-                reply_markup: { inline_keyboard: [[{ text: "Group 💬", url: LINK_GROUP_1 }], [{ text: "Channel 📢", url: LINK_GROUP_3 }], [{ text: "🔄 Semak", callback_data: "recheck" }]] }
             });
         }
     }
 
     if (body.callback_query) {
-        const { id, from, message, data } = body.callback_query;
+        const { id, message, data } = body.callback_query;
         axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/answerCallbackQuery`, { callback_query_id: id });
 
-        if (data === "recheck") {
-            const [j1, j3] = await Promise.all([checkDahJoin(from.id, GROUP_1_ID), checkDahJoin(from.id, GROUP_3_ID)]);
-            if (j1 && j3) {
+        if (data === "dl_wasap" || data === "dl_fb") {
+            const fileId = (data === "dl_wasap") ? FILE_WASAP_BLUSTER : FILE_FB_BLUSTER;
+            
+            try {
+                await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
+                    chat_id: message.chat.id,
+                    document: fileId
+                });
+            } catch (err) {
+                console.log("Error hantar fail:", err.response?.data?.description);
                 axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
                     chat_id: message.chat.id,
-                    text: "Mantap! Sila pilih fail:",
-                    reply_markup: { inline_keyboard: [[{ text: "📥 WasapBluster", callback_data: "dl_wasap" }], [{ text: "📥 FB Bluster", callback_data: "dl_fb" }]] }
+                    text: "❌ Fail gagal dihantar. Sila hubungi admin."
                 });
             }
         }
-
-        if (data === "dl_wasap") axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_WASAP_BLUSTER });
-        if (data === "dl_fb") axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, { chat_id: message.chat.id, document: FILE_FB_BLUSTER });
     }
 });
 
 app.get('/', (req, res) => res.send("Bot Aktif!"));
-
-app.listen(PORT, () => console.log(`Bot running on port ${PORT}`));
+app.listen(PORT);
