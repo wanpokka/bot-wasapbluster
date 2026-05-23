@@ -82,6 +82,14 @@ app.post('/telegram_bot', async (req, res) => {
     }
 });
 
+app.post('/webhook-telegram', async (req, res) => {
+    const msg = req.body.message;
+    if (msg && msg.document) {
+        console.log("FILE_ID TERBARU: ", msg.document.file_id);
+    }
+    // ... kod asal hang ...
+});
+
 // Endpoint untuk elak Render tidur (Ping setiap 5 minit)
 app.get('/', (req, res) => res.send("Bot Aktif!"));
 app.listen(PORT);
