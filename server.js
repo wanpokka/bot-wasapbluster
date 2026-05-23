@@ -6,7 +6,7 @@ app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
 
-// ID FAIL TERBARU DARI LOG ANDA
+// ID FAIL
 const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANBahBBVWgPsr9wxflGS5lj6Uj7wmkAAuwfAAKvwIBUEO_QLK2pENE7BA";
 const FILE_FB_BLUSTER = "BQACAgUAAxkBAANAahBBVZwLHMKxw6boQXS1zOJNFu0AAusfAAKvwIBUglgn-gVguCQ7BA";
 
@@ -20,12 +20,11 @@ const LINK_GROUP_3 = "https://t.me/marketingtoolsmy";
 
 const PORT = process.env.PORT || 3000;
 
-// FUNGSI ANTI-SLEEP (Ping diri sendiri setiap 5 minit)
+// FUNGSI ANTI-SLEEP
 setInterval(() => {
     axios.get(`https://bot-wasapbluster.onrender.com/`).catch(() => {});
 }, 300000); 
 
-// Fungsi menyemak status keahlian kumpulan (Force Join)
 async function checkDahJoin(userId, groupId) {
     try {
         const res = await axios.get(`https://api.telegram.org/bot${TOKEN_BOT}/getChatMember`, {
@@ -33,16 +32,13 @@ async function checkDahJoin(userId, groupId) {
         });
         const status = res.data.result.status;
         return ["member", "administrator", "creator"].includes(status);
-    } catch (error) {
-        return false;
-    }
+    } catch (error) { return false; }
 }
 
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
     res.sendStatus(200);
 
-    // Fungsi Pancing ID (Jika anda forward fail ke bot, ID keluar di log Render)
     if (body.message?.document) {
         console.log("FILE ID DITERIMA: ", body.message.document.file_id);
     }
@@ -119,7 +115,7 @@ app.post('/telegram_bot', async (req, res) => {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
                 chat_id: chatId,
                 document: FILE_WASAP_BLUSTER,
-                caption: "Berikut adalah aplikasi Wasap Bluster Official yang anda minta. Sila pasang (install) pada peranti anda.Allow permission yang diperlukan.TQ!\n\nUntuk trial boleh PM @blusterCS"
+                caption: "Berikut adalah aplikasi Wasap Bluster Official yang anda minta. Sila pasang (install) pada peranti anda. Allow permission yang diperlukan. TQ!\n\nUntuk trial boleh PM @blusterCS"
             });
         }
 
@@ -127,12 +123,15 @@ app.post('/telegram_bot', async (req, res) => {
             await axios.post(`https://api.telegram.org/bot${TOKEN_BOT}/sendDocument`, {
                 chat_id: chatId,
                 document: FILE_FB_BLUSTER,
-                caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda.Allow permission yang diperlukan.TQ!\n\nUntuk trial boleh PM @blusterCS"
+                caption: "Berikut adalah aplikasi FB Bluster Official yang anda minta. Sila pasang (install) pada peranti anda. Allow permission yang diperlukan. TQ!\n\nUntuk trial boleh PM @blusterCS"
             });
         }
     }
 
     res.status(200).send("OK");
 });
+
+// Bahagian yang diubah supaya cron-job tak error
+app.get('/', (req, res) => res.sendStatus(200));
 
 app.listen(PORT, () => console.log(`Server Force Join running on port ${PORT}...`));
