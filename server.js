@@ -5,9 +5,10 @@ const app = express();
 app.use(express.json());
 
 const TOKEN_BOT = "8649706104:AAGFM_z-PTV2QZH3fhWZ2MkDROR2J-1Fcdk";
-// GUNA ID LAMA DULU
-const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vE50"; 
-const FILE_FB_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vE50"; 
+
+// FILE ID TERBARU
+const FILE_WASAP_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
+const FILE_FB_BLUSTER = "BQACAgUAAxkBAANPAheZOKAMfugGP3udrtQkai04G3hOAahoAAIUIU1UOZlP7H0vEvY7BA"; 
 
 const GROUP_1_ID = "@blustermarketingtools"; 
 const GROUP_3_ID = "@marketingtoolsmy";
@@ -31,9 +32,9 @@ async function checkDahJoin(userId, groupId) {
 app.post('/telegram_bot', async (req, res) => {
     const body = req.body;
     
-    // PANCING ID - Kalau hang hantar fail, ID akan keluar kat Log Render
+    // Pancing ID (Biarkan saja, tak kacau bot)
     if (body.message?.document) {
-        console.log("BOOM! FILE ID BARU: ", body.message.document.file_id);
+        console.log("BOOM! FILE ID: ", body.message.document.file_id);
     }
 
     if (!body.message && !body.callback_query) return res.sendStatus(200);
@@ -79,4 +80,6 @@ app.post('/telegram_bot', async (req, res) => {
     }
 });
 
-app.listen(PORT);
+app.get('/', (req, res) => res.send("Bot Aktif!"));
+
+app.listen(PORT, () => console.log(`Bot running on port ${PORT}`));
